@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    
+    <style>
+        /* ============================================
+           GLOBAL RESET & BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Valentine-themed gradient background */
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #ff3f6c 100%);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           MAIN CARD CONTAINER
+           ============================================ */
+        .valentine-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            animation: fadeInScale 0.6s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        h1 {
+            /* Main question text - customize color here */
+            color: #ff4d6d;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        /* Heart decoration above title */
+        h1::before {
+            content: '💕';
+            display: block;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: heartBeat 1.5s infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+        }
+
+        /* ============================================
+           BUTTONS CONTAINER & STYLES
+           ============================================ */
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        .yes-button {
+            z-index: 1;
+            background: #ff4d6d;
+            color: white;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .yes-button:hover {
+            background: #ff3355;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 77, 109, 0.4);
+        }
+
+        .yes-button:active {
+            transform: scale(0.98);
+        }
+
+        /* NO BUTTON - neutral color */
+        .no-button {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .no-button:hover {
+            background: #d0d0d0;
+            transform: scale(1.05);
+        }
+
+        .no-button:active {
+            transform: scale(0.98);
+        }
+
+        /* ============================================
+           SUCCESS STATE (After clicking Yes)
+           ============================================ */
+        .success-container {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .celebration-gif {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .success-message {
+            font-size: 1.4rem;
+            color: #ff4d6d;
+            font-weight: 600;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .dineout-button {
+            background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+            color: white;
+            padding: 18px 35px;
+            font-size: 1.2rem;
+            margin-top: 25px;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(252, 74, 26, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .dineout-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(252, 74, 26, 0.4);
+        }
+
+        /* ============================================
+           CUSTOM TOAST NOTIFICATION
+           ============================================ */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150px);
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 90%;
+            width: 400px;
+            border-left: 5px solid #ff4d6d;
+            animation: slideDown 0.4s ease-out forwards;
+        }
+
+        .toast-notification.hiding {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideDown {
+            to {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                transform: translateX(-50%) translateY(-150px);
+            }
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toast-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .toast-message {
+            color: #333;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        /* ============================================
+           PARTY ANIMATION (Confetti-like hearts)
+           ============================================ */
+        .party-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .confetti {
+            position: absolute;
+            font-size: 2rem;
+            animation: fall 3s linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% {
+                opacity: 1;
+                transform: translateY(-10vh) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(110vh) rotate(720deg);
+            }
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 0.9rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            opacity: 0.9;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN (Mobile-friendly)
+           ============================================ */
+        @media (max-width: 600px) {
+            .valentine-card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            h1::before {
+                font-size: 2.5rem;
+            }
+
+            button {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            .success-message {
+                font-size: 1.2rem;
+            }
+
+            .dineout-button {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .valentine-card {
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .buttons-container {
+                gap: 10px;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.95rem;
+            }
+
+            .toast-notification {
+                width: calc(100% - 30px);
+                padding: 15px 20px;
+            }
+
+            .toast-message {
+                font-size: 0.95rem;
+            }
+
+            .toast-icon {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main React App Container -->
+    <div id="root"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Made with ❤️ by Aditya
+    </div>
+
+    <!-- React & Babel (for JSX) via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Main React Component -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const gifUrl = 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOGpkc2U1bzRleXd3b2MxOW5kdHptN2tpbzhycnVlbDI3M2QwdnViYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/blSTtZehjAZ8I/giphy.gif'
+        const yourBookedDateLink = 'https://swiggy.onelink.me/BVRZ?af_dp=swiggydiners%3A%2F%2Fdetails%2F1010981%3Fsource%3Dsharing' 
+
+        function ValentineApp() {
+            // ============================================
+            // STATE MANAGEMENT
+            // ============================================
+            const [answered, setAnswered] = useState(false);
+            const [yesButtonScale, setYesButtonScale] = useState(1);
+            const [noClickCount, setNoClickCount] = useState(0);
+            const [showToast, setShowToast] = useState(false);
+            const [toastMessage, setToastMessage] = useState('');
+            const [isToastHiding, setIsToastHiding] = useState(false);
+
+            // Playful messages for No button - customize these messages as you like!
+            const playfulMessages = [
+                "Oops! Everyone is allowed one mistake — try again 😉",
+                "Wrong answer! Try again…",
+                "Really? Are you kidding me? 😒",
+                "That can't be right. One more chance!",
+                "Hmm… looks like a misclick!",
+                "I'll pretend I didn't see that. 🤨",
+                "No? That's bold. Try Yes instead 😏"
+            ];
+
+            const [availableMessages, setAvailableMessages] = useState([...playfulMessages]);
+            const [usedMessages, setUsedMessages] = useState([]);
+
+            // ============================================
+            // CUSTOM TOAST NOTIFICATION HANDLER
+            // ============================================
+            const showCustomToast = (message) => {
+                setToastMessage(message);
+                setShowToast(true);
+                setIsToastHiding(false);
+
+                // Auto-hide after 2.5 seconds
+                setTimeout(() => {
+                    setIsToastHiding(true);
+                    // Remove from DOM after animation completes
+                    setTimeout(() => {
+                        setShowToast(false);
+                    }, 400);
+                }, 2500);
+            };
+
+            // ============================================
+            // NO BUTTON HANDLER
+            // ============================================
+            const handleNoClick = () => {
+                // Grow the Yes button (max 3x size)
+                const newScale = Math.min(yesButtonScale + 0.3, 3);
+                setYesButtonScale(newScale);
+                setNoClickCount(noClickCount + 1);
+
+                // Pick a random message from available pool
+                let messageToShow;
+                let newAvailableMessages = [...availableMessages];
+
+                if (newAvailableMessages.length === 0) {
+                    // Reshuffle when exhausted
+                    newAvailableMessages = [...playfulMessages];
+                }
+
+                const randomIndex = Math.floor(Math.random() * newAvailableMessages.length);
+                messageToShow = newAvailableMessages[randomIndex];
+
+                // Remove used message from pool
+                newAvailableMessages.splice(randomIndex, 1);
+                setAvailableMessages(newAvailableMessages);
+                setUsedMessages([...usedMessages, messageToShow]);
+
+                // Show custom toast notification
+                showCustomToast(messageToShow);
+            };
+
+            // ============================================
+            // YES BUTTON HANDLER
+            // ============================================
+            const handleYesClick = () => {
+                setAnswered(true);
+                launchPartyAnimation();
+            };
+
+            // ============================================
+            // PARTY ANIMATION (Confetti Hearts)
+            // ============================================
+            const launchPartyAnimation = () => {
+                const partyContainer = document.createElement('div');
+                partyContainer.className = 'party-container';
+                document.body.appendChild(partyContainer);
+
+                const emojis = ['❤️', '💕', '💖', '💗', '💝', '💓', '💞'];
+                const numberOfConfetti = 50;
+
+                for (let i = 0; i < numberOfConfetti; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    partyContainer.appendChild(confetti);
+                }
+
+                // Remove animation after completion
+                setTimeout(() => {
+                    partyContainer.remove();
+                }, 5000);
+            };
+
+            // ============================================
+            // RENDER
+            // ============================================
+            return (
+                <>
+                    {/* Custom Toast Notification */}
+                    {showToast && (
+                        <div className={`toast-notification ${isToastHiding ? 'hiding' : ''}`}>
+                            <div className="toast-content">
+                                <div className="toast-icon">💔</div>
+                                <div className="toast-message">{toastMessage}</div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="valentine-card">
+                        {!answered ? (
+                            <>
+                                {/* Initial Question State */}
+                                <h1>Will you be my Valentine?</h1>
+                                <div className="buttons-container">
+                                    <button
+                                        className="yes-button"
+                                        onClick={handleYesClick}
+                                        style={{ transform: `scale(${yesButtonScale})` }}
+                                        aria-label="Yes, I will be your Valentine"
+                                    >
+                                        Yes ❤️
+                                    </button>
+                                    <button
+                                        className="no-button"
+                                        onClick={handleNoClick}
+                                        aria-label="No"
+                                    >
+                                        No
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                {/* Success State (After clicking Yes) */}
+                                <div className="success-container" aria-live="polite">
+                                    <h1>Yayyy! 🎉</h1>
+                                    
+                                    {/* TODO: Replace YOUR_FUNNY_GIF_URL_HERE with your chosen GIF URL */}
+                                    {/* Example: https://media.giphy.com/media/3oz8xAFtqoOUUrsh7W/giphy.gif */}
+                                    <img
+                                        src={gifUrl}
+                                        alt="Celebration GIF"
+                                        className="celebration-gif"
+                                    />
+                                    
+                                    <p className="success-message">
+                                        You get to take me on a Valentine date! 💝
+                                    </p>
+                                    
+                                    {/* TODO: Replace YOUR_SWIGGY_DINEOUT_LINK_HERE with your actual Swiggy Dineout reservation link */}
+                                    <a
+                                        href={yourBookedDateLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="dineout-button"
+                                    >
+                                        Click here! to find out where you're taking me 🍽️
+                                    </a>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </>
+            );
+        }
+
+        // ============================================
+        // RENDER APP TO DOM
+        // ============================================
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ValentineApp />);
+    </script>
+</body>
+</html>
